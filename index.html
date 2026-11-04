@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siber Vatan - ÇUBUK FSM MTAL</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #070a12; /* Resmin dışındaki boşluklar için koyu siber tema rengi */
+            user-select: none;
+            cursor: pointer;
+        }
+
+        .bg-fullscreen {
+            width: 100vw;
+            height: 100vh;
+            object-fit: contain; /* Resmi kırpma yapmadan, orantılı bir şekilde ekrana tam sığdırır */
+            object-position: center;
+            display: block;
+            margin: auto;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center relative">
+
+    <!-- ARKA PLAN RESMİ (ana.png) -->
+    <img src="ana.png" alt="Siber Vatan Karşılama Ekranı" class="bg-fullscreen">
+
+    <!-- JAVASCRIPT KONTROLÜ -->
+    <script>
+        function goNextPage() {
+            window.location.href = "siberVatan_sureli.html";
+        }
+
+        // Fare ile herhangi bir yere tıklandığında
+        window.addEventListener("mousedown", goNextPage);
+
+        // Klavyeden herhangi bir tuşa basıldığında
+        window.addEventListener("keydown", goNextPage);
+
+        // Dokunmatik cihazlar için (Mobil/Tablet)
+        window.addEventListener("touchstart", goNextPage);
+    </script>
+</body>
+</html>

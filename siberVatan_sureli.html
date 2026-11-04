@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siber Vatan - FSM MTAL Dijital Kale Portalı</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts (Latin-Ext Türkçe Karakter Desteği Eklendi) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Quicksand:wght@500;600;700&display=swap&subset=latin-ext" rel="stylesheet">
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+    font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #070a12;
+    background-image: 
+        /* Karartma katmanı açıldı (0.80), arka plan wallpaper çok daha belirgin hale geldi */
+        linear-gradient(rgba(7, 10, 18, 0.80), rgba(15, 23, 42, 0.80)),
+        url('sibervatan.jpg');
+    background-repeat: repeat;
+    background-position: center;
+    background-size: 240px auto;
+    background-attachment: fixed;
+    touch-action: manipulation;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+        h1, h2, h3, .font-heading {
+            font-family: 'Fredoka', cursive, sans-serif;
+        }
+
+        .shake {
+            animation: shakeAnim 0.4s ease-in-out;
+        }
+
+        @keyframes shakeAnim {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        .bounce-in {
+            animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .pulse-glow {
+            animation: pulseGlow 2s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(56, 189, 248, 0.8); }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #38bdf8;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between text-slate-100 select-none overflow-x-hidden p-2 sm:p-4">
+
+<!-- HEADER BAR -->
+<header class="w-full max-w-6xl mx-auto bg-slate-800/90 backdrop-blur-md border-2 border-slate-700 rounded-2xl p-4 sm:p-5 shadow-2xl flex justify-between items-center z-10 my-2">
+    <div class="flex items-center gap-3 cursor-pointer" onclick="showMap()">
+        <div class="bg-gradient-to-tr from-cyan-500 to-blue-600 p-3 rounded-xl shadow-lg">
+            <i class="fa-solid fa-shield-halved text-2xl sm:text-3xl text-white"></i>
+        </div>
+        <div>
+            <h1 class="text-xl sm:text-3xl font-bold tracking-wide bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-300 bg-clip-text text-transparent">
+                ÇUBUK Fatih Sultan Mehmet MTAL
+            </h1>
+            <p class="text-sm sm:text-base text-cyan-300 font-semibold tracking-wider font-heading">Siber Vatan</p>
+        </div>
+    </div>
+
+<!-- SCORE -->
+    <div class="flex items-center gap-2 sm:gap-3">
+        <div class="flex items-center gap-2 bg-slate-900/90 border-2 border-rose-500/80 px-3 sm:px-4 py-2 rounded-full shadow-inner">
+            <i class="fa-solid fa-clock text-rose-400 text-lg sm:text-2xl"></i>
+            <div class="text-right">
+                <span class="text-[10px] text-rose-300 font-bold block leading-none">KALAN SÜRE</span>
+                <span id="timerDisplay" class="text-xl sm:text-2xl font-heading font-bold text-rose-400">02:00</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-2 bg-slate-900/90 border-2 border-amber-400/80 px-4 py-2 rounded-full shadow-inner">
+            <i class="fa-solid fa-trophy text-amber-400 text-lg sm:text-2xl animate-bounce"></i>
+            <div class="text-right">
+                <span class="text-[10px] text-amber-300 font-bold block leading-none">SKOR</span>
+                <span id="scoreDisplay" class="text-xl sm:text-2xl font-heading font-bold text-amber-400">100</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+    <!-- MAP PROGRESS BAR -->
+    <div class="w-full max-w-6xl mx-auto my-2 px-2">
+        <div class="flex justify-between items-center text-xs font-bold text-slate-400 mb-1">
+            <span>Siber Vatan Savunma İlerlemesi</span>
+            <span id="completionRateText">0 / 8 Kategori Tamamlandı</span>
+        </div>
+        <div class="w-full h-3 bg-slate-800 rounded-full overflow-hidden border border-slate-700 shadow-inner">
+            <div id="overallProgressBar" class="h-full bg-gradient-to-r from-cyan-400 via-indigo-500 to-emerald-400 w-0 transition-all duration-500"></div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <main class="w-full max-w-6xl mx-auto flex-1 flex flex-col justify-center my-2">
+
+        <!-- SİBER VATAN HARİTASI (MAIN MENU) -->
+        <section id="mapSection" class="game-view bounce-in">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl sm:text-4xl font-bold text-white">Siber Vatan Görev Haritası</h2>
+                <p class="text-slate-300 text-sm sm:text-base mt-1">Görevi seç, bölgeleri siber tehditlerden koru ve tüm rozetleri topla!</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Category 1 -->
+                <div onclick="startCategory(1)" class="bg-slate-800/80 hover:bg-slate-700/90 border-2 border-slate-700 hover:border-cyan-400 p-5 rounded-3xl shadow-xl transition cursor-pointer group flex flex-col justify-between relative overflow-hidden">
+                    <div id="catBadge1" class="hidden absolute top-3 right-3 bg-emerald-500 text-slate-950 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow"><i class="fa-solid fa-check"></i> Tamamlandı</div>
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-cyan-500/20 border border-cyan-400/40 text-cyan-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-key"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1">1. Hesap Güvenliği</h3>
+                        <p class="text-xs text-slate-400">Şifre kalesi, karmaşıklık testleri ve 2FA çift aşamalı doğrulama.</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-700/60 flex justify-between items-center text-xs font-bold text-cyan-300">
+                        <span>Mini Görevler (2)</span>
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
+                    </div>
+                </div>
+
+                <!-- Category 2 -->
+                <div onclick="startCategory(2)" class="bg-slate-800/80 hover:bg-slate-700/90 border-2 border-slate-700 hover:border-indigo-400 p-5 rounded-3xl shadow-xl transition cursor-pointer group flex flex-col justify-between relative overflow-hidden">
+                    <div id="catBadge2" class="hidden absolute top-3 right-3 bg-emerald-500 text-slate-950 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow"><i class="fa-solid fa-check"></i> Tamamlandı</div>
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-indigo-500/20 border border-indigo-400/40 text-indigo-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-fish-fins"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1">2. Oltalama & Tuzaklar</h3>
+                        <p class="text-xs text-slate-400">Sahte kargo, SMS, elmas tuzağı ve dolandırıcılık tespiti.</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-700/60 flex justify-between items-center text-xs font-bold text-indigo-300">
+                        <span>Mini Görevler (3)</span>
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
+                    </div>
+                </div>
+
+                <!-- Category 3 -->
+                <div onclick="startCategory(3)" class="bg-slate-800/80 hover:bg-slate-700/90 border-2 border-slate-700 hover:border-amber-400 p-5 rounded-3xl shadow-xl transition cursor-pointer group flex flex-col justify-between relative overflow-hidden">
+                    <div id="catBadge3" class="hidden absolute top-3 right-3 bg-emerald-500 text-slate-950 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow"><i class="fa-solid fa-check"></i> Tamamlandı</div>
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-amber-500/20 border border-amber-400/40 text-amber-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1">3. Kişisel Veriler</h3>
+                        <p class="text-xs text-slate-400">Veri kalkanı ve sosyal medya dijital ayak izi risk analizi.</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-700/60 flex justify-between items-center text-xs font-bold text-amber-300">
+                        <span>Mini Görevler (2)</span>
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
+                    </div>
+                </div>
+
+                <!-- Category 4 -->
+                <div onclick="startCategory(4)" class="bg-slate-800/80 hover:bg-slate-700/90 border-2 border-slate-700 hover:border-emerald-400 p-5 rounded-3xl shadow-xl transition cursor-pointer group flex flex-col justify-between relative overflow-hidden">
+                    <div id="catBadge4" class="hidden absolute top-3 right-3 bg-emerald-500 text-slate-950 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow"><i class="fa-solid fa-check"></i> Tamamlandı</div>
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-mobile-screen-button"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1">4. Mobil Güvenlik</h3>
+                        <p class="text-xs text-slate-400">Sahte hızlandırma uyarıları ve tehlikeli uygulama izinleri.</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-700/60 flex justify-between items-center text-xs font-bold text-emerald-300">
+                        <span>Mini Görevler (2)</span>
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
+                    </div>
+                </div>
+
+                <!-- Category 5 -->
+                <div onclick="startCategory(5)" class="bg-slate-800/80 hover:bg-slate-700/90 border-2 border-slate-700 hover:border-sky-400 p-5 rounded-3xl shadow-xl transition cursor-pointer group flex flex-col justify-between relative overflow-hidden">
+                    <div id="catBadge5" class="hidden absolute top-3 right-3 bg-emerald-500 text-slate-950 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow"><i class="fa-solid fa-check"></i> Tamamlandı</div>
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-sky-500/20 border border-sky-400/40 text-sky-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-wifi"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1">5. Ağ & Wi-Fi</h3>
+                        <p class="text-xs text-slate-400">Wi-Fi dedektifi, sahte hotspotlar ve HTTPS web denetimi.</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-700/60 flex justify-between items-center text-xs font-bold text-sky-300">
+                        <span>Mini Görevler (2)</span>
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
+                    </div>
+                </div>
+
+                <!-- Category 6 -->
+                <div onclick="startCategory(6)" class="bg-slate-800/80 hover:bg-slate-700/90 border-2 border-slate-700 hover:border-rose-400 p-5 rounded-3xl shadow-xl transition cursor-pointer group flex flex-col justify-between relative overflow-hidden">
+                    <div id="catBadge6" class="hidden absolute top-3 right-3 bg-emerald-500 text-slate-950 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow"><i class="fa-solid fa-check"></i> Tamamlandı</div>
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-rose-500/20 border border-rose-400/40 text-rose-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-bug"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1">6. Virüs Laboratuvarı</h3>
+                        <p class="text-xs text-slate-400">Zararlı `.exe` dosyalarını tespit et ve karantinaya al.</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-700/60 flex justify-between items-center text-xs font-bold text-rose-300">
+                        <span>Mini Görevler (1)</span>
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
+                    </div>
+                </div>
+
+                <!-- Category 7 -->
+                <div onclick="startCategory(7)" class="bg-slate-800/80 hover:bg-slate-700/90 border-2 border-slate-700 hover:border-purple-400 p-5 rounded-3xl shadow-xl transition cursor-pointer group flex flex-col justify-between relative overflow-hidden">
+                    <div id="catBadge7" class="hidden absolute top-3 right-3 bg-emerald-500 text-slate-950 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow"><i class="fa-solid fa-check"></i> Tamamlandı</div>
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-purple-500/20 border border-purple-400/40 text-purple-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-truck-fast"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1">7. Siber Acil Durum</h3>
+                        <p class="text-xs text-slate-400">Hesap ele geçirildiğinde kriz müdahale adımlarını sırala.</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-700/60 flex justify-between items-center text-xs font-bold text-purple-300">
+                        <span>Mini Görevler (1)</span>
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
+                    </div>
+                </div>
+
+                <!-- Category 8 -->
+                <div onclick="startCategory(8)" class="bg-slate-800/80 hover:bg-slate-700/90 border-2 border-slate-700 hover:border-teal-400 p-5 rounded-3xl shadow-xl transition cursor-pointer group flex flex-col justify-between relative overflow-hidden">
+                    <div id="catBadge8" class="hidden absolute top-3 right-3 bg-emerald-500 text-slate-950 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow"><i class="fa-solid fa-check"></i> Tamamlandı</div>
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-teal-500/20 border border-teal-400/40 text-teal-400 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition">
+                            <i class="fa-solid fa-brain"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-1">8. Siber Etik</h3>
+                        <p class="text-xs text-slate-400">Telif hakları, dijital vatandaşlık ve etik kurallar.</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-700/60 flex justify-between items-center text-xs font-bold text-teal-300">
+                        <span>Mini Görevler (1)</span>
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FINAL CERTIFICATE BANNER (Shown when all finished) -->
+            <div id="certificateBanner" class="hidden mt-8 bg-gradient-to-r from-amber-500/20 via-yellow-500/30 to-amber-500/20 border-2 border-amber-400 p-6 rounded-3xl text-center backdrop-blur-md">
+                <h3 class="text-2xl font-bold text-amber-300 mb-2">🏆 BÜTÜN SİBER VATAN BÖLGELERİ KORUNDU!</h3>
+                <p class="text-slate-200 text-sm mb-4">Siber Vatan Kahramanı unvanını ve rozet sertifikanı almak için hemen tıkla.</p>
+                <button onclick="showFinalCertificate()" class="bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-950 font-heading font-bold text-lg px-8 py-3 rounded-2xl shadow-xl transition active:scale-95">
+                    Sertifikamı Görüntüle
+                </button>
+            </div>
+        </section>
+
+       <!-- CATEGORY 1 VIEW: HESAP GÜVENLİĞİ -->
+        <section id="catView1" class="game-view hidden bg-slate-800/80 border-2 border-slate-700 rounded-3xl p-5 sm:p-8 shadow-2xl backdrop-blur-md bounce-in">
+            <div class="text-center mb-6">
+                <span class="bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider inline-block mb-2">
+                    Kategori 1: Hesap Güvenliği
+                </span>
+                <h2 class="text-2xl sm:text-4xl font-bold text-white">Şifre Kalesi & 2FA Görevi</h2>
+            </div>
+
+            <!-- Görsel & İçerik Esnek Alanı (Ortalanmış) -->
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
+                <!-- SOL RESİM ALANI -->
+                <div class="w-full lg:w-1/4 flex items-center justify-center min-h-[140px] p-2 bg-transparent">
+                    <img src="soru1_sol.png" alt="Hesap Güvenliği Sol" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" 
+                         class="max-h-48 w-auto object-contain drop-shadow-[0_0_15px_rgba(56,189,248,0.4)]">
+                    <div class="hidden flex-col items-center justify-center text-slate-500 text-xs font-semibold gap-1">
+                        <i class="fa-solid fa-image text-2xl text-cyan-400/50"></i>
+                        <span>soru1_sol.png</span>
+                    </div>
+                </div>
+
+                <!-- ORTA SORU & ETKİLEŞİM ALANI -->
+                <div class="w-full lg:w-2/4 flex-1">
+                    <!-- Sub Task 1: Password -->
+                    <div id="c1_task1" class="space-y-4">
+                        <p class="text-slate-300 text-sm text-center">Siber Vatanını korumak için en az 8 karakterli, büyük/küçük harf ve rakam içeren güçlü bir şifre belirle:</p>
+                        <div class="relative">
+                            <input type="text" id="passwordInput" placeholder="Güçlü şifreni yaz..." 
+                                   class="w-full bg-slate-900/90 border-2 border-slate-600 rounded-2xl px-5 py-4 text-lg text-cyan-300 placeholder-slate-500 focus:outline-none focus:border-cyan-400 transition font-mono shadow-inner">
+                        </div>
+                        <div id="step1Alert" class="hidden p-4 rounded-2xl text-center font-semibold text-sm border transition shadow-lg"></div>
+                        <button onclick="checkStep1Password()" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-heading text-lg py-4 rounded-2xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-shield-check"></i> Şifreyi Doğrula
+                        </button>
+                    </div>
+
+                    <!-- Sub Task 2: 2FA Selection -->
+                    <div id="c1_task2" class="hidden space-y-4">
+                        <div class="bg-slate-900/90 p-5 rounded-2xl border border-cyan-500/40 text-center">
+                            <i class="fa-solid fa-lock text-4xl text-cyan-400 mb-2"></i>
+                            <h3 class="text-lg font-bold text-white">Çift Aşamalı Doğrulama (2FA) Katmanı</h3>
+                            <p class="text-xs text-slate-400 mt-1">Şifren ele geçirilse bile hesabını korumak için en güvenli 2FA yöntemini seç:</p>
+                        </div>
+                        <div class="grid grid-cols-1 gap-3">
+                            <button onclick="check2FA('sms')" class="bg-slate-900 hover:bg-slate-700 border border-slate-700 p-4 rounded-xl text-left text-sm font-semibold transition flex justify-between items-center text-slate-200">
+                                <span>📱 SMS Doğrulama Kodu</span>
+                            </button>
+                            <button onclick="check2FA('app')" class="bg-slate-900 hover:bg-slate-700 border border-slate-700 p-4 rounded-xl text-left text-sm font-semibold transition flex justify-between items-center text-slate-200">
+                                <span>🔑 Doğrulama Uygulaması (Authenticator / Güvenlik Anahtarı)</span>
+                            </button>
+                            <button onclick="check2FA('none')" class="bg-slate-900 hover:bg-slate-700 border border-slate-700 p-4 rounded-xl text-left text-sm font-semibold transition flex justify-between items-center text-slate-200">
+                                <span>❌ İki Aşamalı Doğrulamayı Kapat</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SAĞ RESİM ALANI -->
+                <div class="w-full lg:w-1/4 flex items-center justify-center min-h-[140px] p-2 bg-transparent">
+                    <img src="soru1_sag.png" alt="Hesap Güvenliği Sağ" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" 
+                         class="max-h-48 w-auto object-contain drop-shadow-[0_0_15px_rgba(56,189,248,0.4)]">
+                    <div class="hidden flex-col items-center justify-center text-slate-500 text-xs font-semibold gap-1">
+                        <i class="fa-solid fa-image text-2xl text-cyan-400/50"></i>
+                        <span>soru1_sag.png</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+       <!-- CATEGORY 2 VIEW: OLTALAMA & TUZAKLAR -->
+        <section id="catView2" class="game-view hidden bg-slate-800/80 border-2 border-slate-700 rounded-3xl p-5 sm:p-8 shadow-2xl backdrop-blur-md bounce-in">
+            <div class="text-center mb-6">
+                <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider inline-block mb-2">
+                    Kategori 2: Oltalama Tuzakları
+                </span>
+                <h2 class="text-2xl sm:text-4xl font-bold text-white">Şüpheli Mesaj & Link Avcısı</h2>
+            </div>
+
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
+                <!-- SOL RESİM ALANI -->
+                <div class="w-full lg:w-1/4 flex items-center justify-center min-h-[140px] p-2 bg-transparent">
+                    <img src="soru2_sol.png" alt="Oltalama Sol" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" 
+                         class="max-h-48 w-auto object-contain drop-shadow-[0_0_15px_rgba(129,140,248,0.4)]">
+                    <div class="hidden flex-col items-center justify-center text-slate-500 text-xs font-semibold gap-1">
+                        <i class="fa-solid fa-image text-2xl text-indigo-400/50"></i>
+                        <span>soru2_sol.png</span>
+                    </div>
+                </div>
+
+                <!-- ORTA SORU ALANI -->
+                <div class="w-full lg:w-2/4 space-y-4 flex-1">
+                    <div id="msgCard1" class="bg-slate-900/90 border-2 border-slate-700 p-4 rounded-2xl shadow-md">
+                        <p class="text-xs text-slate-400 mb-1">Gelen SMS #1</p>
+                        <p class="text-sm font-bold text-slate-200">"Kargonuz teslim edilemedi. 24 TL ödeme yapmak için tıkla: kargo-takip-sorgu.net"</p>
+                        <div id="msgAction1" class="flex gap-3 mt-3">
+						<button id="btn1_phishing" onclick="classifyMessage(1, 'phishing')" class="flex-1 bg-rose-600/20 hover:bg-rose-600 border border-rose-500 text-rose-300 hover:text-white py-2 rounded-xl text-xs font-bold transition">🚨 Tuzak / Şüpheli</button>
+						<button id="btn1_safe" onclick="classifyMessage(1, 'safe')" class="flex-1 bg-emerald-600/20 hover:bg-emerald-600 border border-emerald-500 text-emerald-300 hover:text-white py-2 rounded-xl text-xs font-bold transition">✅ Güvenli Link</button>
+                      </div>
+                    </div>
+
+                    <div id="msgCard2" class="bg-slate-900/90 border-2 border-slate-700 p-4 rounded-2xl shadow-md">
+                        <p class="text-xs text-slate-400 mb-1">Gelen SMS #2</p>
+                        <p class="text-sm font-bold text-slate-200">"MEB e-Okul Duyurusu: Sınav sonuçlarınıza resmi meb.gov.tr adresinden ulaşabilirsiniz."</p>
+                        <div id="msgAction2" class="flex gap-3 mt-3">
+						<button id="btn2_phishing" onclick="classifyMessage(2, 'phishing')" class="flex-1 bg-rose-600/20 hover:bg-rose-600 border border-rose-500 text-rose-300 hover:text-white py-2 rounded-xl text-xs font-bold transition">🚨 Tuzak / Şüpheli</button>
+						<button id="btn2_safe" onclick="classifyMessage(2, 'safe')" class="flex-1 bg-emerald-600/20 hover:bg-emerald-600 border border-emerald-500 text-emerald-300 hover:text-white py-2 rounded-xl text-xs font-bold transition">✅ Güvenli Link</button>
+					 </div>
+                    </div>
+
+                    <div id="msgCard3" class="bg-slate-900/90 border-2 border-slate-700 p-4 rounded-2xl shadow-md">
+                        <p class="text-xs text-slate-400 mb-1">Gelen SMS #3</p>
+                        <p class="text-sm font-bold text-slate-200">"Tebrikler! Oyunda 10.000 Ücretsiz Elmas Kazandın! Tıkla: free-elmas-kazan.net"</p>
+                        <div id="msgAction3" class="flex gap-3 mt-3">
+							<button id="btn3_phishing" onclick="classifyMessage(3, 'phishing')" class="flex-1 bg-rose-600/20 hover:bg-rose-600 border border-rose-500 text-rose-300 hover:text-white py-2 rounded-xl text-xs font-bold transition">🚨 Tuzak / Şüpheli</button>
+							<button id="btn3_safe" onclick="classifyMessage(3, 'safe')" class="flex-1 bg-emerald-600/20 hover:bg-emerald-600 border border-emerald-500 text-emerald-300 hover:text-white py-2 rounded-xl text-xs font-bold transition">✅ Güvenli Link</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SAĞ RESİM ALANI -->
+                <div class="w-full lg:w-1/4 flex items-center justify-center min-h-[140px] p-2 bg-transparent">
+                    <img src="soru2_sag.png" alt="Oltalama Sağ" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" 
+                         class="max-h-48 w-auto object-contain drop-shadow-[0_0_15px_rgba(129,140,248,0.4)]">
+                    <div class="hidden flex-col items-center justify-center text-slate-500 text-xs font-semibold gap-1">
+                        <i class="fa-solid fa-image text-2xl text-indigo-400/50"></i>
+                        <span>soru2_sag.png</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+       <!-- CATEGORY 3 VIEW: KİŞİSEL VERİLER -->
+        <section id="catView3" class="game-view hidden bg-slate-800/80 border-2 border-slate-700 rounded-3xl p-5 sm:p-8 shadow-2xl backdrop-blur-md bounce-in">
+            <div class="text-center mb-6">
+                <span class="bg-amber-500/20 text-amber-300 border border-amber-400/30 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider inline-block mb-2">
+                    Kategori 3: Kişisel Veriler
+                </span>
+                <h2 class="text-2xl sm:text-4xl font-bold text-white">Veri Kalkanı & Ayak İzi</h2>
+            </div>
+
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
+                <!-- SOL RESİM ALANI -->
+                <div class="w-full lg:w-1/4 flex items-center justify-center min-h-[140px] p-2 bg-transparent">
+                    <img src="soru3_sol.png" alt="Kişisel Veriler Sol" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" 
+                         class="max-h-48 w-auto object-contain drop-shadow-[0_0_15px_rgba(251,191,36,0.4)]">
+                    <div class="hidden flex-col items-center justify-center text-slate-500 text-xs font-semibold gap-1">
+                        <i class="fa-solid fa-image text-2xl text-amber-400/50"></i>
+                        <span>soru3_sol.png</span>
+                    </div>
+                </div>
+
+                <!-- ORTA SORU ALANI -->
+                <div class="w-full lg:w-2/4 flex-1">
+                    <div id="sortingItemArea" class="bg-slate-900/80 p-4 rounded-2xl border-2 border-dashed border-amber-400/60 max-w-md mx-auto text-center my-4 min-h-[120px] flex flex-col justify-center items-center">
+                        <p class="text-xs text-slate-400 uppercase font-bold mb-1">Sıradaki Veri Kartı:</p>
+                        <div id="currentCard" class="text-xl font-bold text-amber-300 flex items-center gap-3"></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                        <button onclick="sortCurrentCard('public')" class="bg-emerald-950/60 hover:bg-emerald-900/80 border-2 border-emerald-500 p-4 rounded-2xl text-center transition active:scale-95 flex flex-col items-center gap-1">
+                            <i class="fa-solid fa-globe text-3xl text-emerald-400"></i>
+                            <span class="text-base font-bold text-emerald-300">Paylaşılabilir (Genel)</span>
+                        </button>
+
+                        <button onclick="sortCurrentCard('private')" class="bg-rose-950/60 hover:bg-rose-900/80 border-2 border-rose-500 p-4 rounded-2xl text-center transition active:scale-95 flex flex-col items-center gap-1">
+                            <i class="fa-solid fa-lock text-3xl text-rose-400"></i>
+                            <span class="text-base font-bold text-rose-300">Gizli Kalmalı! (Kişisel)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SAĞ RESİM ALANI -->
+                <div class="w-full lg:w-1/4 flex items-center justify-center min-h-[140px] p-2 bg-transparent">
+                    <img src="soru3_sag.png" alt="Kişisel Veriler Sağ" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" 
+                         class="max-h-48 w-auto object-contain drop-shadow-[0_0_15px_rgba(251,191,36,0.4)]">
+                    <div class="hidden flex-col items-center justify-center text-slate-500 text-xs font-semibold gap-1">
+                        <i class="fa-solid fa-image text-2xl text-amber-400/50"></i>
+                        <span>soru3_sag.png</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+       <!-- CATEGORY 4 VIEW: MOBİL GÜVENLİK -->
+        <section id="catView4" class="game-view hidden bg-slate-800/80 border-2 border-slate-700 rounded-3xl p-5 sm:p-8 shadow-2xl backdrop-blur-md bounce-in">
+            <div class="text-center mb-6">
+                <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider inline-block mb-2">
+                    Kategori 4: Mobil Güvenlik
+                </span>
+                <h2 class="text-2xl sm:text-4xl font-bold text-white">Uygulama İzin Laboratuvarı</h2>
+            </div>
+
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
+                <!-- SOL RESİM ALANI -->
+                <div class="w-full lg:w-1/4 flex items-center justify-center min-h-[140px] p-2 bg-transparent">
+                    <img src="soru4_sol.png" alt="Mobil Güvenlik Sol" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" 
+                         class="max-h-48 w-auto object-contain drop-shadow-[0_0_15px_rgba(52,211,153,0.4)]">
+                    <div class="hidden flex-col items-center justify-center text-slate-500 text-xs font-semibold gap-1">
+                        <i class="fa-solid fa-image text-2xl text-emerald-400/50"></i>
+                        <span>soru4_sol.png</span>
+                    </div>
+                </div>
+
+                <!-- ORTA SORU ALANI -->
+                <div class="w-full lg:w-2/4 flex-1">
+                    <div class="max-w-md mx-auto bg-slate-900 border-4 border-slate-700 rounded-3xl p-5 shadow-2xl">
+                        <div class="text-center mb-4">
+                            <div class="w-16 h-16 mx-auto bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center text-3xl mb-2">
+                                <i class="fa-solid fa-bolt"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-white">"Süper Fener & Temizleyici"</h3>
+                            <p class="text-xs text-rose-400 font-semibold mt-1">⚠️ Aşağıdaki izinleri talep ediyor:</p>
+                        </div>
+
+                        <div class="space-y-3 my-4 text-xs font-bold">
+                            <div class="flex justify-between items-center p-3 bg-slate-800 rounded-xl">
+                                <span>📷 Kamera İzni</span>
+                                <span class="text-slate-400">İzin İstiyor</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-slate-800 rounded-xl">
+                                <span>📖 Rehber & Kişiler</span>
+                                <span class="text-slate-400">İzin İstiyor</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-slate-800 rounded-xl">
+                                <span>📍 Anlık Konum</span>
+                                <span class="text-slate-400">İzin İstiyor</span>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3 mt-5">
+                            <button onclick="checkMobileApp(false)" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-xs transition">
+                                🚫 İzinleri Reddet & Yükleme
+                            </button>
+                            <button onclick="checkMobileApp(true)" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 rounded-xl text-xs transition">
+                                ✅ Tüm İzinleri Ver
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SAĞ RESİM ALANI -->
+                <div class="w-full lg:w-1/4 flex items-center justify-center min-h-[140px] p-2 bg-transparent">
+                    <img src="soru4_sag.png" alt="Mobil Güvenlik Sağ" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" 
+                         class="max-h-48 w-auto object-contain drop-shadow-[0_0_15px_rgba(52,211,153,0.4)]">
+                    <div class="hidden flex-col items-center justify-center text-slate-500 text-xs font-semibold gap-1">
+                        <i class="fa-solid fa-image text-2xl text-emerald-400/50"></i>
+                        <span>soru4_sag.png</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+       <!-- CATEGORY 5 VIEW: AĞ & WI-FI -->
+        <section id="catView5" class="game-view hidden bg-slate-800/80 border-2 border-slate-700 rounded-3xl p-5 sm:p-8 shadow-2xl backdrop-blur-md bounce-in">
+            <div class="text-center mb-6">
+                <span class="bg-sky-500/20 text-sky-300 border border-sky-400/30 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider inline-block mb-2">
+                    Kategori 5: Ağ & Wi-Fi Güvenliği
+                </span>
+                <h2 class="text-2xl sm:text-4xl font-bold text-white">Wi-Fi Dedektifi</h2>
+                <p class="text-slate-300 text-sm mt-1">Okul bahçesindesin. Hangisine bağlanmak güvenli?</p>
+            </div>
+
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
+                <!-- SOL RESİM ALANI -->
+                <div class="w-full lg:w-1/4 flex items-center justify-center min-h-[140px] p-2 bg-transparent">
+                    <img src="soru5_sol.png" alt="Ağ Wi-Fi Sol" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" 
+                         class="max-h-48 w-auto object-contain drop-shadow-[0_0_15px_rgba(56,189,248,0.4)]">
+                    <div class="hidden flex-col items-center justify-center text-slate-500 text-xs font-semibold gap-1">
+                        <i class="fa-solid fa-image text-2xl text-sky-400/50"></i>
+                        <span>soru5_sol.png</span>
+                    </div>
+                </div>
+
+                <!-- ORTA SORU ALANI -->
+                <div class="w-full lg:w-2/4 flex-1 space-y-3">
+                    <button onclick="checkWifi('free')" class="w-full bg-slate-900 hover:bg-slate-700 border border-slate-700 p-4 rounded-2xl text-left flex justify-between items-center transition">
+                        <div>
+                            <p class="font-bold text-white text-sm">📶 ÜCRETSİZ_HIZLI_INTERNET</p>
+                        </div>
+                        <i class="fa-solid fa-wifi text-slate-400 text-xl"></i>
+                    </button>
+
+                    <button onclick="checkWifi('okul')" class="w-full bg-slate-900 hover:bg-slate-700 border border-slate-700 p-4 rounded-2xl text-left flex justify-between items-center transition">
+                        <div>
+                            <p class="font-bold text-white text-sm">📶 FSM_MTAL_KURUMSAL</p>
+                        </div>
+                        <i class="fa-solid fa-wifi text-slate-400 text-xl"></i>
+                    </button>
+
+                    <button onclick="checkWifi('fake')" class="w-full bg-slate-900 hover:bg-slate-700 border border-slate-700 p-4 rounded-2xl text-left flex justify-between items-center transition">
+                        <div>
+                            <p class="font-bold text-white text-sm">📶 BEDAVA_WIFI_2026</p>
+                        </div>
+                        <i class="fa-solid fa-wifi text-slate-400 text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- SAĞ RESİM ALANI -->
+                <div class="w-full lg:w-1/4 flex items-center justify-center min-h-[140px] p-2 bg-transparent">
+                    <img src="soru5_sag.png" alt="Ağ Wi-Fi Sağ" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" 
+                         class="max-h-48 w-auto object-contain drop-shadow-[0_0_15px_rgba(56,189,248,0.4)]">
+                    <div class="hidden flex-col items-center justify-center text-slate-500 text-xs font-semibold gap-1">
+                        <i class="fa-solid fa-image text-2xl text-sky-400/50"></i>
+                        <span>soru5_sag.png</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CATEGORY 6 VIEW: VİRÜS LAB -->
+        <section id="catView6" class="game-view hidden bg-slate-800/80 border-2 border-slate-700 rounded-3xl p-5 sm:p-8 shadow-2xl backdrop-blur-md bounce-in">
+            <div class="text-center mb-6">
+                <span class="bg-rose-500/20 text-rose-300 border border-rose-400/30 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider inline-block mb-2">
+                    Kategori 6: Virüs Laboratuvarı
+                </span>
+                <h2 class="text-2xl sm:text-4xl font-bold text-white">Masaüstü Dosya Taraması</h2>
+                <p class="text-slate-300 text-sm mt-1">Bilgisayarın yavaşladı! Hangi dosya zararlıyım diye bağırıyor?</p>
+            </div>
+
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
+                <!-- SOL RESİM ALANI -->
+                <div class="w-full lg:w-1/4 flex items-center justify-center min-h-[140px] p-2 bg-transparent">
+                    <img src="soru6_sol.png" alt="Virüs Lab Sol" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" 
+                         class="max-h-48 w-auto object-contain drop-shadow-[0_0_15px_rgba(244,63,94,0.4)]">
+                    <div class="hidden flex-col items-center justify-center text-slate-500 text-xs font-semibold gap-1">
+                        <i class="fa-solid fa-image text-2xl text-rose-400/50"></i>
+                        <span>soru6_sol.png</span>
+                    </div>
+                </div>
+
+                <!-- ORTA SORU ALANI -->
+                <div class="w-full lg:w-2/4 flex-1">
+                    <div class="max-w-md mx-auto bg-slate-900 border-2 border-slate-700 p-4 rounded-2xl grid grid-cols-2 gap-3 text-center">
+                        <div onclick="checkVirus('chrome')" class="bg-slate-800 hover:bg-slate-700 p-4 rounded-xl cursor-pointer transition border border-slate-700">
+                            <i class="fa-brands fa-chrome text-4xl text-blue-400 mb-2"></i>
+                            <p class="text-xs font-bold text-white">Google Chrome</p>
+                        </div>
+
+                        <div onclick="checkVirus('malware')" class="bg-slate-800 hover:bg-slate-700 p-4 rounded-xl cursor-pointer transition border border-slate-700">
+                            <i class="fa-solid fa-file-code text-4xl text-rose-500 mb-2"></i>
+                            <p class="text-xs font-bold text-rose-300">oyun_hile_kirici.exe</p>
+                        </div>
+
+                        <div onclick="checkVirus('defender')" class="bg-slate-800 hover:bg-slate-700 p-4 rounded-xl cursor-pointer transition border border-slate-700">
+                            <i class="fa-solid fa-shield-virus text-4xl text-emerald-400 mb-2"></i>
+                            <p class="text-xs font-bold text-white">Windows Defender</p>
+                        </div>
+
+                        <div onclick="checkVirus('pdf')" class="bg-slate-800 hover:bg-slate-700 p-4 rounded-xl cursor-pointer transition border border-slate-700">
+                            <i class="fa-solid fa-file-pdf text-4xl text-red-400 mb-2"></i>
+                            <p class="text-xs font-bold text-white">ders_notlari.pdf</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SAĞ RESİM ALANI -->
+                <div class="w-full lg:w-1/4 flex items-center justify-center min-h-[140px] p-2 bg-transparent">
+                    <img src="soru6_sag.png" alt="Virüs Lab Sağ" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" 
+                         class="max-h-48 w-auto object-contain drop-shadow-[0_0_15px_rgba(244,63,94,0.4)]">
+                    <div class="hidden flex-col items-center justify-center text-slate-500 text-xs font-semibold gap-1">
+                        <i class="fa-solid fa-image text-2xl text-rose-400/50"></i>
+                        <span>soru6_sag.png</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+		
+        <!-- CATEGORY 7 VIEW: SİBER ACİL DURUM -->
+        <section id="catView7" class="game-view hidden bg-slate-800/80 border-2 border-slate-700 rounded-3xl p-5 sm:p-8 shadow-2xl backdrop-blur-md bounce-in">
+            <div class="text-center mb-6">
+                <span class="bg-purple-500/20 text-purple-300 border border-purple-400/30 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider inline-block mb-2">
+                    Kategori 7: Siber Acil Durum
+                </span>
+                <h2 class="text-2xl sm:text-4xl font-bold text-white">Kriz Müdahale Operasyonu</h2>
+                <p class="text-slate-300 text-sm mt-1">🚨 Hesabından arkadaşlarına spam mesajlar gitmeye başladı! İlk yapman gereken en öncelikli adım ne?</p>
+            </div>
+
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
+                <!-- SOL RESİM ALANI -->
+                <div class="w-full lg:w-1/4 flex items-center justify-center min-h-[140px] p-2 bg-transparent">
+                    <img src="soru7_sol.png" alt="Siber Acil Durum Sol" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" 
+                         class="max-h-48 w-auto object-contain drop-shadow-[0_0_15px_rgba(192,132,252,0.4)]">
+                    <div class="hidden flex-col items-center justify-center text-slate-500 text-xs font-semibold gap-1">
+                        <i class="fa-solid fa-image text-2xl text-purple-400/50"></i>
+                        <span>soru7_sol.png</span>
+                    </div>
+                </div>
+
+                <!-- ORTA SORU ALANI -->
+                <div class="w-full lg:w-2/4 flex-1 space-y-3">
+                    <button onclick="checkEmergency('wait')" class="w-full bg-slate-900 hover:bg-slate-700 border border-slate-700 p-4 rounded-2xl text-left font-bold text-sm text-slate-300 transition">
+                        1. Hesabın düzelmesini beklemek
+                    </button>
+                    <button onclick="checkEmergency('pass')" class="w-full bg-slate-900 hover:bg-slate-700 border border-slate-700 p-4 rounded-2xl text-left font-bold text-sm text-slate-300 transition">
+                        2. Tüm aktif oturumları kapatıp derhal şifreyi değiştirmek
+                    </button>
+                    <button onclick="checkEmergency('delete')" class="w-full bg-slate-900 hover:bg-slate-700 border border-slate-700 p-4 rounded-2xl text-left font-bold text-sm text-slate-300 transition">
+                        3. Telefonu tamamen sıfırlamak
+                    </button>
+                </div>
+
+                <!-- SAĞ RESİM ALANI -->
+                <div class="w-full lg:w-1/4 flex items-center justify-center min-h-[140px] p-2 bg-transparent">
+                    <img src="soru7_sag.png" alt="Siber Acil Durum Sağ" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" 
+                         class="max-h-48 w-auto object-contain drop-shadow-[0_0_15px_rgba(192,132,252,0.4)]">
+                    <div class="hidden flex-col items-center justify-center text-slate-500 text-xs font-semibold gap-1">
+                        <i class="fa-solid fa-image text-2xl text-purple-400/50"></i>
+                        <span>soru7_sag.png</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CATEGORY 8 VIEW: SİBER ETİK -->
+        <section id="catView8" class="game-view hidden bg-slate-800/80 border-2 border-slate-700 rounded-3xl p-5 sm:p-8 shadow-2xl backdrop-blur-md bounce-in">
+            <div class="text-center mb-6">
+                <span class="bg-teal-500/20 text-teal-300 border border-teal-400/30 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider inline-block mb-2">
+                    Kategori 8: Siber Etik
+                </span>
+                <h2 class="text-2xl sm:text-4xl font-bold text-white">Dijital Vatandaşlık Kuralları</h2>
+                <p class="text-slate-300 text-sm mt-1">İnternette karşılaştığın bu durum doğru mu, yanlış mı?</p>
+            </div>
+
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
+                <!-- SOL RESİM ALANI -->
+                <div class="w-full lg:w-1/4 flex items-center justify-center min-h-[140px] p-2 bg-transparent">
+                    <img src="soru8_sol.png" alt="Siber Etik Sol" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" 
+                         class="max-h-48 w-auto object-contain drop-shadow-[0_0_15px_rgba(45,212,191,0.4)]">
+                    <div class="hidden flex-col items-center justify-center text-slate-500 text-xs font-semibold gap-1">
+                        <i class="fa-solid fa-image text-2xl text-teal-400/50"></i>
+                        <span>soru8_sol.png</span>
+                    </div>
+                </div>
+
+                <!-- ORTA SORU ALANI -->
+                <div class="w-full lg:w-2/4 flex-1">
+                    <div class="bg-slate-900 p-5 rounded-2xl border border-teal-500/40 text-center mb-5">
+                        <p class="text-base font-bold text-slate-200">"Bir arkadaşının izni olmadan çekilmiş komik fotoğrafını sınıflar grubunda paylaşmak."</p>
+                    </div>
+
+                    <div class="flex gap-4 max-w-md mx-auto">
+                        <button onclick="checkEthics(false)" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded-2xl transition">
+                            ✅ Doğru Davranış
+                        </button>
+                        <button onclick="checkEthics(true)" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-bold py-4 rounded-2xl transition">
+                            ❌ Etik Dışı / Yanlış
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SAĞ RESİM ALANI -->
+                <div class="w-full lg:w-1/4 flex items-center justify-center min-h-[140px] p-2 bg-transparent">
+                    <img src="soru8_sag.png" alt="Siber Etik Sağ" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" 
+                         class="max-h-48 w-auto object-contain drop-shadow-[0_0_15px_rgba(45,212,191,0.4)]">
+                    <div class="hidden flex-col items-center justify-center text-slate-500 text-xs font-semibold gap-1">
+                        <i class="fa-solid fa-image text-2xl text-teal-400/50"></i>
+                        <span>soru8_sag.png</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FINAL CERTIFICATE VIEW -->
+        <section id="certificateView" class="game-view hidden bg-slate-800/80 border-2 border-slate-700 rounded-3xl p-6 sm:p-10 shadow-2xl backdrop-blur-md text-center bounce-in">
+            <div class="inline-block bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-bold px-6 py-2 rounded-full text-xs uppercase mb-4 shadow-lg">
+                Resmi Dijital Başarı Sertifikası
+            </div>
+
+            <h2 class="text-3xl sm:text-5xl font-extrabold text-white mb-2">TEBRİKLER SİBER KAHRAMAN!</h2>
+            <p class="text-slate-300 text-sm sm:text-base max-w-xl mx-auto">FSM MTAL Siber Vatan savunma portalındaki 8 kategoriyi başarıyla korudun!</p>
+
+            <div id="starsContainer" class="flex justify-center gap-3 my-4 text-4xl text-amber-400">
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+            </div>
+
+            <!-- Certificate Box -->
+            <div class="bg-gradient-to-br from-slate-900 to-indigo-950 border-4 border-cyan-400 p-6 rounded-3xl max-w-md mx-auto shadow-2xl pulse-glow my-4 relative overflow-hidden">
+                <div class="w-16 h-16 mx-auto bg-cyan-500/20 text-cyan-400 rounded-full flex items-center justify-center border-2 border-cyan-400 text-3xl mb-2">
+                    <i class="fa-solid fa-award"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">Siber Vatan Başarı Rozeti</h3>
+                <p class="text-cyan-300 text-xs font-semibold mt-1">FSM MTAL Siber Güvenlik Muhafızı</p>
+
+                <div class="mt-4 pt-4 border-t border-slate-700 flex justify-around text-center text-xs">
+                    <div>
+                        <span class="text-slate-400 block">Toplam Skor</span>
+                        <span id="finalScoreDisplay" class="text-xl font-bold text-amber-400">100</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block">Rozet Durumu</span>
+                        <span class="text-emerald-400 font-bold">8 / 8 Kazanıldı</span>
+                    </div>
+                </div>
+            </div>
+
+			<button onclick="window.location.href='index.html'" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-6 py-3 rounded-xl text-sm transition">
+                <i class="fa-solid fa-map mr-2"></i> Yeni Oyun
+            </button>
+        </section>
+
+    </main>
+
+    <!-- SİBER TEMA POPUP MODAL (HATA DURUMU İÇİN) -->
+    <div id="errorModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-slate-900 border-2 border-rose-500/80 rounded-3xl p-6 sm:p-8 max-w-md w-full text-center shadow-2xl bounce-in relative overflow-hidden">
+            <!-- Arka plan hafif neon parıltısı -->
+            <div class="absolute -top-12 -right-12 w-32 h-32 bg-rose-500/10 rounded-full blur-2xl"></div>
+            
+            <div class="w-20 h-20 mx-auto bg-rose-500/20 text-rose-400 border-2 border-rose-500 rounded-2xl flex items-center justify-center text-4xl mb-4 shadow-lg animate-bounce">
+                <i class="fa-solid fa-shield-virus"></i>
+            </div>
+
+            <span class="bg-rose-500/20 text-rose-400 border border-rose-500/40 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest inline-block mb-2">
+                Güvenlik İhlali Tespit Edildi
+            </span>
+
+            <h3 class="text-2xl font-bold text-white mb-2">Siber Tehdit Uyarısı!</h3>
+            
+            <p id="errorModalMessage" class="text-slate-300 text-sm mb-6 leading-relaxed">
+                Yanlış bir hamle yaptın. Siber savunma hatlarında açık oluştu!
+            </p>
+
+            <div id="errorPenalty" class="inline-flex items-center gap-2 bg-rose-950/60 border border-rose-500/40 px-4 py-2 rounded-xl mb-6 text-rose-400 font-bold text-sm">
+                <i class="fa-solid fa-circle-minus"></i>
+                <span>-5 Puan Kaybettin</span>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button id="errorCloseButton" onclick="closeErrorModal()" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-heading font-bold py-3.5 rounded-2xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-check"></i> Tamam
+                </button>
+                <button id="errorRetryButton" onclick="restartGame()" class="hidden w-full bg-gradient-to-r from-rose-600 to-red-700 hover:from-rose-500 hover:to-red-600 text-white font-heading font-bold py-3.5 rounded-2xl shadow-lg transition active:scale-95 items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> Tekrar Oyna
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="w-full max-w-6xl mx-auto text-center py-3 text-xs text-slate-400">
+        Fatih Sultan Mehmet Mesleki ve Teknik Anadolu Lisesi &bull; <span class="text-cyan-400 font-bold">Siber Vatan Portal </span>
+    </footer>
+
+    <script>
+        // STATE VARIABLES
+        let currentScore = 100;
+        const completedCategories = new Set();
+
+        // OYUN SÜRESİ: 2 DAKİKA
+        let remainingTime = 120;
+        let gameTimer = null;
+        let gameOver = false;
+        let gameWon = false;
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(remainingTime / 60);
+            const seconds = remainingTime % 60;
+            document.getElementById('timerDisplay').textContent =
+                String(minutes).padStart(2, '0') + ':' +
+                String(seconds).padStart(2, '0');
+        }
+
+        function startGameTimer() {
+            clearInterval(gameTimer);
+            remainingTime = 120;
+            gameOver = false;
+            gameWon = false;
+            updateTimerDisplay();
+
+            gameTimer = setInterval(() => {
+                if (gameOver || gameWon) {
+                    clearInterval(gameTimer);
+                    return;
+                }
+
+                remainingTime = Math.max(0, remainingTime - 1);
+                updateTimerDisplay();
+
+                if (remainingTime === 0 && completedCategories.size < 8) {
+                    timeIsUp();
+                }
+            }, 1000);
+        }
+
+        function timeIsUp() {
+            if (gameOver || gameWon) return;
+
+            gameOver = true;
+            clearInterval(gameTimer);
+
+            document.getElementById('errorModalMessage').textContent =
+                'Üzgünüm, süre sonunda siber savunma düştü! Tüm görevleri 2 dakika içinde tamamlayamadın.';
+            document.getElementById('errorPenalty').classList.add('hidden');
+
+            document.getElementById('errorCloseButton').classList.remove('hidden');
+            document.getElementById('errorRetryButton').classList.remove('hidden');
+            document.getElementById('errorRetryButton').classList.add('flex');
+
+            document.getElementById('errorModal').classList.remove('hidden');
+        }
+
+        function restartGame() {
+            // index.html aynı klasördeyse ana oyun sayfasına döner.
+            window.location.href = 'index.html';
+        }
+
+        const sortingItems = [
+            { id: 1, label: "T.C. Kimlik Numarası", icon: "fa-id-card", type: "private" },
+            { id: 2, label: "En Sevdiğin Renk", icon: "fa-palette", type: "public" },
+            { id: 3, label: "Ev Adresi & Konum", icon: "fa-house-user", type: "private" },
+            { id: 4, label: "Oyun Kullanıcı Adı", icon: "fa-gamepad", type: "public" }
+        ];
+        let currentCardIndex = 0;
+
+        // TEMA İLE UYUMLU ÖZEL POPUP MANTIĞI
+        function showErrorModal(message) {
+            if (gameOver || gameWon) return;
+            document.getElementById('errorModalMessage').innerText = message;
+            document.getElementById('errorPenalty').classList.remove('hidden');
+            document.getElementById('errorCloseButton').classList.remove('hidden');
+            document.getElementById('errorRetryButton').classList.add('hidden');
+            document.getElementById('errorRetryButton').classList.remove('flex');
+            document.getElementById('errorModal').classList.remove('hidden');
+        }
+
+        function closeErrorModal() {
+            // Süre bittiyse Tamam yalnızca uyarıyı kapatır; oyun yeniden başlamaz.
+            document.getElementById('errorModal').classList.add('hidden');
+        }
+
+        function deductPoints(pts = 5, reasonMessage) {
+            currentScore = Math.max(0, currentScore - pts);
+            const el = document.getElementById('scoreDisplay');
+            el.innerText = currentScore;
+            el.parentElement.classList.add('shake');
+            setTimeout(() => el.parentElement.classList.remove('shake'), 400);
+
+            showErrorModal(reasonMessage || "Yanlış karar verdin ve savunma zafiyeti oluştu!");
+        }
+
+        function markCategoryComplete(catNum) {
+            if (gameOver || gameWon || completedCategories.has(catNum)) return;
+            completedCategories.add(catNum);
+            document.getElementById('catBadge' + catNum).classList.remove('hidden');
+            
+            // Progress Update
+            const count = completedCategories.size;
+            document.getElementById('completionRateText').innerText = `${count} / 8 Kategori Tamamlandı`;
+            document.getElementById('overallProgressBar').style.width = `${(count / 8) * 100}%`;
+
+            confetti({ particleCount: 40, spread: 60, origin: { y: 0.7 } });
+
+            if (count === 8) {
+                gameWon = true;
+                clearInterval(gameTimer);
+                document.getElementById('certificateBanner').classList.remove('hidden');
+            }
+
+            setTimeout(() => {
+                showMap();
+            }, 1200);
+        }
+
+        function hideAllViews() {
+            document.querySelectorAll('.game-view').forEach(el => el.classList.add('hidden'));
+        }
+
+        function showMap() {
+            hideAllViews();
+            document.getElementById('mapSection').classList.remove('hidden');
+        }
+
+        function startCategory(catNum) {
+            if (gameOver || gameWon) return;
+            hideAllViews();
+            document.getElementById('catView' + catNum).classList.remove('hidden');
+
+            if (catNum === 3) renderStep3Card();
+        }
+
+        // CAT 1 LOGIC
+        function checkStep1Password() {
+            const val = document.getElementById('passwordInput').value;
+            const isValid = val.length >= 8 && /[A-Z]/.test(val) && /[a-z]/.test(val) && /[0-9]/.test(val);
+
+            if (isValid) {
+                document.getElementById('c1_task1').classList.add('hidden');
+                document.getElementById('c1_task2').classList.remove('hidden');
+            } else {
+                deductPoints(5, "Şifreniz yeterince güçlü değil! Şifre en az 8 karakter, büyük/küçük harf ve rakam içermelidir.");
+            }
+        }
+
+        function check2FA(type) {
+            if (type === 'app') {
+                markCategoryComplete(1);
+            } else {
+                deductPoints(5, "Seçtiğiniz yöntem en güvenli katman değildir. Authenticator / Güvenlik Anahtarı uygulamaları çok daha yüksek koruma sağlar.");
+            }
+        }
+
+        
+     
+        // CAT 2 LOGIC
+        const msgState = {};
+        function classifyMessage(id, choice) {
+            const answers = { 1: 'phishing', 2: 'safe', 3: 'phishing' };
+            const correctChoice = answers[id];
+
+            // Tıklanan butonu al
+            const btnChosen = document.getElementById(`btn${id}_${choice}`);
+            const otherChoice = choice === 'phishing' ? 'safe' : 'phishing';
+            const btnOther = document.getElementById(`btn${id}_${otherChoice}`);
+
+            if (choice === correctChoice) {
+                // DOĞRU SEÇİM: Seçilen buton hover rengini (dolu canlı renk) alır ve kilitlenir
+                if(choice === 'phishing') {
+                    btnChosen.className = "flex-1 bg-rose-600 border border-rose-500 text-white py-2 rounded-xl text-xs font-bold transition shadow-lg ring-2 ring-rose-400";
+                } else {
+                    btnChosen.className = "flex-1 bg-emerald-600 border border-emerald-500 text-white py-2 rounded-xl text-xs font-bold transition shadow-lg ring-2 ring-emerald-400";
+                }
+                
+                // Her iki butonu da kilitle, kartın etrafını yeşil yap
+                btnChosen.disabled = true;
+                if(btnOther) {
+                    btnOther.disabled = true;
+                    btnOther.style.opacity = '0.4';
+                }
+
+                document.getElementById('msgCard' + id).classList.add('border-emerald-500');
+                msgState[id] = true;
+                if (Object.keys(msgState).length === 3) markCategoryComplete(2);
+
+            } else {
+                // YANLIŞ SEÇİM: Yanlış seçilen buton soluklaşır ve tıklanmaz olur, diğer seçenek aktif kalır
+                if(choice === 'phishing') {
+                    btnChosen.className = "flex-1 bg-rose-950/40 border border-rose-900 text-rose-500 py-2 rounded-xl text-xs font-bold transition opacity-50 cursor-not-allowed";
+                } else {
+                    btnChosen.className = "flex-1 bg-emerald-950/40 border border-emerald-900 text-emerald-500 py-2 rounded-xl text-xs font-bold transition opacity-50 cursor-not-allowed";
+                }
+                btnChosen.disabled = true;
+
+                // Puan düşür ve hata modalı göster
+                deductPoints(5, "Yanlış tespit! Bu hamle savunmada açık oluşturdu. Diğer seçeneği deneyebilirsin.");
+            }
+        }
+
+        // CAT 3 LOGIC
+        function renderStep3Card() {
+            const itemArea = document.getElementById('currentCard');
+            if (currentCardIndex < sortingItems.length) {
+                const item = sortingItems[currentCardIndex];
+                itemArea.innerHTML = `<i class="fa-solid ${item.icon} text-2xl text-amber-400"></i> <span>${item.label}</span>`;
+            } else {
+                markCategoryComplete(3);
+            }
+        }
+
+        function sortCurrentCard(type) {
+            if (currentCardIndex < sortingItems.length) {
+                if (type === sortingItems[currentCardIndex].type) {
+                    currentCardIndex++;
+                    renderStep3Card();
+                } else {
+                    deductPoints(5, "Kişisel veriyi yanlış kategoriye koydunuz! Gizli kalması gereken bilgileri herkese açık paylaşmamalısınız.");
+                }
+            }
+        }
+
+        // CAT 4 LOGIC
+        function checkMobileApp(approved) {
+            if (!approved) {
+                markCategoryComplete(4);
+            } else {
+                deductPoints(5, "Gereksiz izinler verdiniz! Basit bir fener veya temizlik uygulaması rehberinize ve konumunuza erişmemelidir.");
+            }
+        }
+
+        // CAT 5 LOGIC
+        function checkWifi(type) {
+            if (type === 'okul') {
+                markCategoryComplete(5);
+            } else {
+                deductPoints(5, "Şifresiz ve sahte halka açık ağlar verilerinizin çalınmasına sebep olabilir! Resmi ve korumalı ağları seçin.");
+            }
+        }
+
+        // CAT 6 LOGIC
+        function checkVirus(type) {
+            if (type === 'malware') {
+                markCategoryComplete(6);
+            } else {
+                deductPoints(5, "Seçtiğiniz dosya güvenli bir sistem bileşenidir. Bilgisayarınızı tehdit eden şüpheli .exe dosyasını bulun!");
+            }
+        }
+
+        // CAT 7 LOGIC
+        function checkEmergency(type) {
+            if (type === 'pass') {
+                markCategoryComplete(7);
+            } else {
+                deductPoints(5, "Kriz anında ilk öncelik aktif oturumları kapatmak ve şifreyi derhal güncellemektir.");
+            }
+        }
+
+        // CAT 8 LOGIC
+        function checkEthics(isEthical) {
+            if (isEthical) {
+                markCategoryComplete(8);
+            } else {
+                deductPoints(5, "Başkasının izni olmadan çekilmiş fotoğrafları topluluk gruplarında paylaşmak bir siber etik ihlalidir.");
+            }
+        }
+
+        // Süre dolduktan sonra arka plandaki oyun butonlarının çalışmasını engelle.
+        document.addEventListener('click', function (event) {
+            if (!gameOver) return;
+            const allowed = event.target.closest('#errorCloseButton, #errorRetryButton');
+            if (!allowed) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+            }
+        }, true);
+
+        // SAYFA AÇILDIĞINDA GERİ SAYIMI BAŞLAT
+        startGameTimer();
+
+        // CERTIFICATE
+		function showFinalCertificate() {
+            hideAllViews();
+            document.getElementById('finalScoreDisplay').innerText = currentScore;
+            document.getElementById('certificateView').classList.remove('hidden');
+            confetti({ particleCount: 100, spread: 100, origin: { y: 0.5 } });
+		}
+    </script>
+</body>
+</html>
